@@ -37,6 +37,7 @@ struct item {
 	char *text;
 	struct item *left, *right;
 	int out, hp;
+	int index;
 	double distance;
 };
 
@@ -53,6 +54,7 @@ static struct item *items = NULL;
 static struct item *matches, *matchend;
 static struct item *prev, *curr, *next, *sel;
 static int mon = -1, screen;
+static int print_index = 0;
 static int managed = 0;
 
 static Atom clip, utf8;
@@ -739,7 +741,11 @@ insert:
 		break;
 	case XK_Return:
 	case XK_KP_Enter:
-		puts((sel && !(ev->state & ShiftMask)) ? sel->text : text);
+		if (print_index)
+			printf("%d\n", (sel && !(ev->state & ShiftMask)) ? sel->index : -1);
+		else
+			puts((sel && !(ev->state & ShiftMask)) ? sel->text : text);
+
 		if (!(ev->state & ControlMask)) {
 			cleanup();
 			exit(0);
@@ -838,6 +844,7 @@ readstdin(FILE* stream)
 		if (!(items[i].text = strdup(buf)))
 			die("cannot strdup %u bytes:", strlen(buf) + 1);
 		items[i].out = 0;
+		items[i].index = i;
 		items[i].hp = arrayhas(hpitems, hplength, items[i].text);
 		drw_font_getexts(drw->fonts, buf, strlen(buf), &tmpmax, NULL);
 		if (tmpmax > inputw) {
@@ -1065,6 +1072,8 @@ main(int argc, char *argv[])
 			managed = 1;
 		} else if (!strcmp(argv[i], "-P"))   /* is the input a password */
 			passwd = 1;
+		else if (!strcmp(argv[i], "-ix"))  /* adds ability to return index in list */
+			print_index = 1;
 		else if (i + 1 == argc)
 			usage();
 		/* these options take one argument */
