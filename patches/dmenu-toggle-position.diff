@@ -1,0 +1,44 @@
+From 0bd1e230fbae8b2f18bb88fc4f7056645baa9d23 Mon Sep 17 00:00:00 2001
+From: NRK <nrk@disroot.org>
+Date: Sun, 15 Aug 2021 22:46:40 +0600
+Subject: [PATCH] turn -b into a toggle
+
+currently config.h allows users to set the value of topbar to 0.
+however if one does that, there's no way for him to get a topbar again.
+it makes more sense to have -b as a toggle instead.
+---
+ dmenu.1 | 2 +-
+ dmenu.c | 4 ++--
+ 2 files changed, 3 insertions(+), 3 deletions(-)
+
+diff --git a/dmenu.1 b/dmenu.1
+index 323f93c..5c9c488 100644
+--- a/dmenu.1
++++ b/dmenu.1
+@@ -38,7 +38,7 @@ which lists programs in the user's $PATH and runs the result in their $SHELL.
+ .SH OPTIONS
+ .TP
+ .B \-b
+-dmenu appears at the bottom of the screen.
++toggle top/bottom position.
+ .TP
+ .B \-f
+ dmenu grabs the keyboard before reading stdin if not reading from a tty. This
+diff --git a/dmenu.c b/dmenu.c
+index 98507d9..c76b2a0 100644
+--- a/dmenu.c
++++ b/dmenu.c
+@@ -716,8 +716,8 @@ main(int argc, char *argv[])
+ 		if (!strcmp(argv[i], "-v")) {      /* prints version information */
+ 			puts("dmenu-"VERSION);
+ 			exit(0);
+-		} else if (!strcmp(argv[i], "-b")) /* appears at the bottom of the screen */
+-			topbar = 0;
++		} else if (!strcmp(argv[i], "-b")) /* toggle top/bottom position */
++			topbar = !(topbar);
+ 		else if (!strcmp(argv[i], "-f"))   /* grabs keyboard before reading stdin */
+ 			fast = 1;
+ 		else if (!strcmp(argv[i], "-i")) { /* case-insensitive item matching */
+-- 
+2.33.0
+
