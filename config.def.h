@@ -27,6 +27,9 @@ static unsigned int columns    = 0;
 static unsigned int lineheight = 0;
 static unsigned int min_lineheight = 8;
 
+/* -n option; preselected item starting from 0 */
+static unsigned int preselected = 0;
+
 /*
  * Characters not considered part of a word while deleting words
  * for example: " /?\"&[]"

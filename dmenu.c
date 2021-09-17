@@ -856,8 +856,19 @@ static void
 run(void)
 {
 	XEvent ev;
+	int i;
 
 	while (!XNextEvent(dpy, &ev)) {
+		if (preselected) {
+			for (i = 0; i < preselected; i++) {
+				if (sel && sel->right && (sel = sel->right) == next) {
+					curr = next;
+					calcoffsets();
+				}
+			}
+			drawmenu();
+			preselected = 0;
+		}
 		if (XFilterEvent(&ev, win))
 			continue;
 		switch(ev.type) {
@@ -1024,7 +1035,7 @@ usage(void)
 	fputs("usage: dmenu [-bfsvP] [-l lines] [-h height] [-p prompt] [-fn font] [-m monitor]\n"
 	      "             [-nb color] [-nf color] [-sb color] [-sf color]\n"
 	      "             [-nhb color] [-nhf color] [-shb color] [-shf color] [-w windowid]\n"
-          "             [-hb color] [-hf color] [-hp items] [-dy command]\n", stderr);
+          "             [-hb color] [-hf color] [-hp items] [-n number] [-dy command]\n", stderr);
 	exit(1);
 }
 
@@ -1094,6 +1105,8 @@ main(int argc, char *argv[])
 			colors[SchemeHp][ColFg] = argv[++i];
 		else if (!strcmp(argv[i], "-w"))   /* embedding window id */
 			embed = argv[++i];
+		else if (!strcmp(argv[i], "-n"))   /* preselected item */
+			preselected = atoi(argv[++i]);
 		else if (!strcmp(argv[i], "-hp"))
 			hpitems = tokenize(argv[++i], ",", &hplength);
 		else if (!strcmp(argv[i], "-dy"))  /* dynamic command to run */
