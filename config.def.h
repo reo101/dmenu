@@ -22,6 +22,18 @@ static const char *colors[SchemeLast][2] = {
 	[SchemeOut] = { "#000000", "#00ffff" },
 	[SchemeHp] = { "#bbbbbb", "#333333" }
 };
+
+static const char xcol[4][8] = {
+	//background
+	"color0",
+	//foreground
+	"color2",
+	//selection background 
+	"color2",
+	//selection foreground 
+	"color0",
+};
+
 /* -l and -g options; controls number of lines and columns in grid if > 0 */
 static unsigned int lines      = 0;
 static unsigned int columns    = 0;
