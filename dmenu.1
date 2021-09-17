@@ -37,6 +37,10 @@ dmenu \- dynamic menu
 .RB [ \-w
 .IR windowid ]
 .RB [ \-wm ]
+.RB [ \-d
+.IR separator ]
+.RB [ \-D
+.IR separator ]
 .P
 .BR dmenu_run " ..."
 .SH DESCRIPTION
@@ -131,6 +135,14 @@ embed into windowid.
 .TP
 .BI \-wm
 Display as a managed WM window (e.g. don't set overide_redirect flag)
+.TP
+.BI \-d " separator"
+separate the input into two halves on the first occurrence of the given charcter.
+Display only the first half in dmenu and print the second half to stdout upon selection.
+Appending '|' to the separator reverses the display/printing order.
+.TP
+.BI \-D " separator"
+same as \-d but separate based on the last occurrence.
 .SH USAGE
 dmenu is completely controlled by the keyboard.  Items are selected using the
 arrow keys, page up, page down, home, and end.

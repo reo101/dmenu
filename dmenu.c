@@ -35,6 +35,7 @@ enum { SchemeNorm, SchemeSel, SchemeNormHighlight, SchemeSelHighlight,
 
 struct item {
 	char *text;
+	char *text_output;
 	struct item *left, *right;
 	int out, hp;
 	int index;
@@ -46,6 +47,9 @@ static int hplength = 0;
 static char numbers[NUMBERSBUFSIZE] = "";
 static char text[BUFSIZ] = "";
 static char *embed;
+static char separator;
+static int separator_greedy;
+static int separator_reverse;
 static int bh, mw, mh;
 static int inputw = 0, promptw, passwd = 0;
 static int lrpad; /* sum of left and right padding */
@@ -759,7 +763,7 @@ insert:
 		if (print_index)
 			printf("%d\n", (sel && !(ev->state & ShiftMask)) ? sel->index : -1);
 		else
-			puts((sel && !(ev->state & ShiftMask)) ? sel->text : text);
+			puts((sel && !(ev->state & ShiftMask)) ? sel->text_output : text);
 
 		if (!(ev->state & ControlMask)) {
 			cleanup();
@@ -858,6 +862,18 @@ readstdin(FILE* stream)
 			*p = '\0';
 		if (!(items[i].text = strdup(buf)))
 			die("cannot strdup %u bytes:", strlen(buf) + 1);
+		if (separator && (p = (separator_greedy) ?
+			strrchr(items[i].text, separator) : strchr(items[i].text, separator))) {
+			*p = '\0';
+			items[i].text_output = ++p;
+		} else {
+			items[i].text_output = items[i].text;
+		}
+		if (separator_reverse) {
+			char *tmp = items[i].text;
+			items[i].text = items[i].text_output;
+			items[i].text_output = tmp;
+		}
 		items[i].out = 0;
 		items[i].index = i;
 		items[i].hp = arrayhas(hpitems, hplength, items[i].text);
@@ -1057,7 +1073,8 @@ usage(void)
 	fputs("usage: dmenu [-bfsrvP] [-l lines] [-h height] [-p prompt] [-fn font] [-m monitor]\n"
 	      "             [-nb color] [-nf color] [-sb color] [-sf color]\n"
 	      "             [-nhb color] [-nhf color] [-shb color] [-shf color] [-w windowid]\n"
-          "             [-hb color] [-hf color] [-hp items] [-n number] [-dy command]\n", stderr);
+          "             [-hb color] [-hf color] [-hp items] [-n number] [-dy command]\n"
+          "             [-d separator] [-D separator]\n", stderr);
 	exit(1);
 }
 
@@ -1139,6 +1156,11 @@ main(int argc, char *argv[])
 			dynamic = argv[++i];
 		else if (!strcmp(argv[i], "-bw"))
 			border_width = atoi(argv[++i]); /* border width */
+		else if (!strcmp(argv[i], "-d") || !strcmp(argv[i], "-D")) { /* field separator */
+			separator_reverse = (*(argv[i+1]+1) == '|');
+			separator_greedy = !strcmp(argv[i], "-D");
+			separator = *argv[++i];
+		}
 		else
 			usage();
 
